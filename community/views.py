@@ -47,6 +47,8 @@ from user.views import decode_jwt
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.decorators import user_passes_test
 
+from django.db import connection
+
 load_dotenv()  # 환경 변수를 로드함
 
 
@@ -164,36 +166,44 @@ class BookShareContentPostHtml(APIView):
         return Response(template_name=self.template_name)
 
 
+class BookShareContentPostDetailHtmlOldVersion(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+    template_name = 'community/book_share_content_post_detail_old.html'
+
+    def get(self, request, pk):
+        import logging
+        from django.db import connection
+
+        # 로거 설정
+        logging.basicConfig(level=logging.DEBUG)
+        logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
+
+        post = Post.objects.get(pk=pk)
+        comments = Comment.objects.filter(post__post_id=pk)
+
+        print(connection.queries)
+
+        post_serializer = PostOldSerializer(post)
+        comment_serializer = CommentOldSerializer(comments, many=True)
+        context = {
+            'post': post_serializer.data,
+            'comments': comment_serializer.data,
+        }
+
+        return Response(context, template_name=self.template_name)
+
+
 class BookShareContentPostDetailHtml(APIView):
     renderer_classes = [TemplateHTMLRenderer]
     template_name = 'community/book_share_content_post_detail.html'
 
-    def get_file_path(self):
-        if FILE_SAVE_POINT == 'local':
-            return MEDIA_URL
-        else:
-            return AWS_S3_CUSTOM_DOMAIN
-
     def get(self, request, pk):
-        file_path = self.get_file_path()
 
-        try:
-            post = Post.objects.get(pk=pk)
-            comments = Comment.objects.filter(post__post_id=pk)
-        except Post.DoesNotExist:
-            print('post not exist.')
-            return Response(status=404, template_name=self.template_name)
+        post = Post.objects.filter(pk=pk).prefetch_related('comments').first()
+
         post_serializer = PostSerializer(post)
-        comment_serializer = CommentSerializer(comments, many=True)
-        context = {
-            'file_path': file_path,
-            'post': post_serializer.data,
-            'comments': comment_serializer.data,
-            'user_id': request.user.user_id,
-        }
 
-        print(comments)
-        return Response(context, template_name=self.template_name)
+        return Response({'post': post_serializer.data}, template_name=self.template_name)
 
 
 class BookList(APIView):

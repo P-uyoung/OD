@@ -20,7 +20,7 @@ class Comment(models.Model):
     comment_created_date = models.DateTimeField(auto_now_add=True)
     comment_updated_date = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='comments', on_delete=models.CASCADE)
 
 
 class BookRequest(models.Model):

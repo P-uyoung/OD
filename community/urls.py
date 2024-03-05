@@ -28,6 +28,8 @@ urlpatterns = [
     path('books/share/content/post/', views.BookShareContentPostHtml.as_view(),
          name='book_share_content_post'),
     path('books/share/content/post/detail/<int:pk>',
+         views.BookShareContentPostDetailHtmlOldVersion.as_view(), name='book_share_content_post_detail_old_version'),
+    path('books/share/content/post/detail/old/<int:pk>',
          views.BookShareContentPostDetailHtml.as_view(), name='book_share_content_post_detail'),
 
 
