@@ -28,8 +28,16 @@
 
     /* 호버 시 내부 이미지 부드럽게 확대 */
     .card-img {
-        transition: transform 0.5s ease; 
-    }
+    /* Set a fixed height for all images */
+    height: 250px; 
+    /* Use object-fit to ensure the image covers the area without stretching */
+    object-fit: cover; 
+    /* Set width to 100% to ensure it covers the card width */
+    width: 100%; 
+    /* Transition for the transform property to scale images on hover */
+    transition: transform 0.5s ease; 
+}
+
     
     .card:hover .card-img {
         transform: scale(1.2); 

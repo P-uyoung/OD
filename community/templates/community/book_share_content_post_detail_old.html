@@ -51,7 +51,7 @@
         <div class="row">
             <div class="col-auto menu-font fs-3 ms-2 mb-3">
                 <span>댓글</span>
-                <span>{{post.comments|length}}</span>
+                <span>{{comments|length}}</span>
             </div>
         </div>
 
@@ -68,7 +68,7 @@
     </form> 
 
     <!-- 댓글-->
-    {% for comment in post.comments %}
+    {% for comment in comments %}
         <div class="row">
             <div class="col-1 d-flex justify-content-center">
                 <img src="{{ comment.user.user_profile_path }}" alt="프로필 사진" width="30" height="30" class="rounded-circle">
