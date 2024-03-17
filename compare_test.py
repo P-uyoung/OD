@@ -21,7 +21,7 @@ request_factory = RequestFactory()
 pk_test_value = 1
 
 def view_test_old():
-    request = request_factory.get(f'/books/share/content/post/detail/{pk_test_value}/')
+    request = request_factory.get(f'/books/share/content/post/detail/old/{pk_test_value}/')
     # Manually authenticate the user
     request.user = test_user
     response = BookShareContentPostDetailHtmlOldVersion.as_view()(request, pk=pk_test_value)

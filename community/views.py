@@ -166,45 +166,21 @@ class BookShareContentPostHtml(APIView):
         return Response(template_name=self.template_name)
 
 
-class BookShareContentPostDetailHtmlOldVersion(APIView):
+class BookShareContentPostDetailHtml(APIView):
     renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'community/book_share_content_post_detail_old.html'
+    template_name = 'community/book_share_content_post_detail.html'
+    # renderer_classes = [JSONRenderer]
 
     def get(self, request, pk):
-        import logging
-        from django.db import connection
-
-        # 로거 설정
-        logging.basicConfig(level=logging.DEBUG)
-        logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
 
         post = Post.objects.get(pk=pk)
         comments = Comment.objects.filter(post__post_id=pk)
 
-        print(connection.queries)
-
-        post_serializer = PostOldSerializer(post)
-        comment_serializer = CommentOldSerializer(comments, many=True)
-        context = {
-            'post': post_serializer.data,
-            'comments': comment_serializer.data,
-        }
-
-        return Response(context, template_name=self.template_name)
-
-
-class BookShareContentPostDetailHtml(APIView):
-    renderer_classes = [TemplateHTMLRenderer]
-    template_name = 'community/book_share_content_post_detail.html'
-
-    def get(self, request, pk):
-
-        post = Post.objects.filter(pk=pk).prefetch_related('comments').first()
-
         post_serializer = PostSerializer(post)
+        comment_serializer = CommentSerializer(comments, many=True)
 
         return Response({'post': post_serializer.data}, template_name=self.template_name)
-
+        # return Response({'post': post_serializer.data, 'comments':comment_serializer.data}, template_name=self.template_name)
 
 class BookList(APIView):
     renderer_classes = [JSONRenderer]

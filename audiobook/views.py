@@ -346,54 +346,54 @@ class ContentPlayHTML(APIView):
             print("파일 저장에 실패했습니다.")
             return JsonResponse({'error': 'Failed to save file'}, status=500)
 
-        # # mp3 파일 생성 후 book 객체에 저장하기
-        # # SSH 클라이언트 생성
-        # client = paramiko.SSHClient()
-        # # 호스트 키 자동으로 수락
-        # client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # # SSH 연결 (키 기반 인증)
-        # client.connect(hostname=hostname, username=username,
-        #                key_filename=key_filename)
+        # mp3 파일 생성 후 book 객체에 저장하기
+        # SSH 클라이언트 생성
+        client = paramiko.SSHClient()
+        # 호스트 키 자동으로 수락
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # SSH 연결 (키 기반 인증)
+        client.connect(hostname=hostname, username=username,
+                       key_filename=key_filename)
 
-        # sftp = client.open_sftp()
+        sftp = client.open_sftp()
 
-        # # 파일을 전송할 원격 경로
-        # remote_file_path = f'/home/kimyea0454/project-main/assets/weights/{voice_name}.pth'
+        # 파일을 전송할 원격 경로
+        remote_file_path = f'/home/kimyea0454/project-main/assets/weights/{voice_name}.pth'
 
-        # # 파일 전송(voice.voice_path에 있는 pth 파일을 sftp로 업로드)
-        # sftp.put(voice_file_path, remote_file_path)
+        # 파일 전송(voice.voice_path에 있는 pth 파일을 sftp로 업로드)
+        sftp.put(voice_file_path, remote_file_path)
 
-        # # 셸 세션 열기
-        # shell = client.invoke_shell()
+        # 셸 세션 열기
+        shell = client.invoke_shell()
 
-        # commands = [
-        #     f'python3 tts.py {content}\n',
-        #     'cd project-main\n',
-        #     f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
-        #     'rm -rf audios/tts.mp3\n',
-        #     f'rm -rf assets/weights/{voice_name}.pth\n',
-        # ]
+        commands = [
+            f'python3 tts.py {content}\n',
+            'cd project-main\n',
+            f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
+            'rm -rf audios/tts.mp3\n',
+            f'rm -rf assets/weights/{voice_name}.pth\n',
+        ]
 
-        # for cmd in commands:
-        #     shell.send(cmd)
-        #     # 각 명령의 실행이 끝날 때까지 기다림
-        #     output = receive_until_prompt(shell, prompt='$ ')
-        #     print(output)  # 받은 출력을 표시함
+        for cmd in commands:
+            shell.send(cmd)
+            # 각 명령의 실행이 끝날 때까지 기다림
+            output = receive_until_prompt(shell, prompt='$ ')
+            print(output)  # 받은 출력을 표시함
 
-        # # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
-        # remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
-        # project_path = os.getcwd()
-        # folder_path = os.path.join(project_path, 'static', 'temp')  # 경로 조합
-        # if not os.path.exists(folder_path):
-        #     os.makedirs(folder_path)
+        # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
+        remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
+        project_path = os.getcwd()
+        folder_path = os.path.join(project_path, 'static', 'temp')  # 경로 조합
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
 
-        # # 로컬로 mp3 다운로드(로컬에 받고 db에 저장)
-        # sftp.get(remote_path, os.path.join(
-        #     project_path, f'static/temp/{voice_name}.mp3'))
+        # 로컬로 mp3 다운로드(로컬에 받고 db에 저장)
+        sftp.get(remote_path, os.path.join(
+            project_path, f'static/temp/{voice_name}.mp3'))
 
-        # # SFTP 세션 종료
-        # sftp.close()
-        # client.close()
+        # SFTP 세션 종료
+        sftp.close()
+        client.close()
 
         return JsonResponse({'success': 'true'}, status=200)
 
@@ -494,62 +494,62 @@ class voice_custom_upload(APIView):
             if Voice.objects.filter(voice_name=voice_name).exists():
                 return JsonResponse({'error': '이미 존재하는 이름입니다.'}, status=400)
 
-            # # mp3를 rvc로 바꾸는 로직
-            # # SSH 클라이언트 생성
-            # client = paramiko.SSHClient()
-            # # 호스트 키 자동으로 수락
-            # client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            # # SSH 연결 (키 기반 인증)
-            # client.connect(hostname=hostname, username=username,
-            #                key_filename=key_filename)
+            # mp3를 rvc로 바꾸는 로직
+            # SSH 클라이언트 생성
+            client = paramiko.SSHClient()
+            # 호스트 키 자동으로 수락
+            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            # SSH 연결 (키 기반 인증)
+            client.connect(hostname=hostname, username=username,
+                           key_filename=key_filename)
 
-            # # 셸 세션 열기
-            # shell = client.invoke_shell()
+            # 셸 세션 열기
+            shell = client.invoke_shell()
 
-            # commands = [
-            #     'ls\n',
-            #     'cd project-main\n',
-            #     'rm -rf voices\n',
-            #     'mkdir voices\n',
-            #     'cd assets\n',
-            #     'rm -rf weights\n',
-            #     'mkdir weights\n',
-            #     'cd ..\n',
-            # ]
+            commands = [
+                'ls\n',
+                'cd project-main\n',
+                'rm -rf voices\n',
+                'mkdir voices\n',
+                'cd assets\n',
+                'rm -rf weights\n',
+                'mkdir weights\n',
+                'cd ..\n',
+            ]
 
-            # for cmd in commands:
-            #     shell.send(cmd)
-            #     # 각 명령의 실행이 끝날 때까지 기다립니다.
-            #     output = receive_until_prompt(shell, prompt='$ ')
-            #     print(output)  # 받은 출력을 표시합니다.
+            for cmd in commands:
+                shell.send(cmd)
+                # 각 명령의 실행이 끝날 때까지 기다립니다.
+                output = receive_until_prompt(shell, prompt='$ ')
+                print(output)  # 받은 출력을 표시합니다.
 
-            # # SFTP 클라이언트 시작
-            # sftp_client = client.open_sftp()
+            # SFTP 클라이언트 시작
+            sftp_client = client.open_sftp()
 
-            # # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
-            # remote_rvc_path = f'/home/kimyea0454/project-main/voices/{voice_name}.mp3'
+            # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
+            remote_rvc_path = f'/home/kimyea0454/project-main/voices/{voice_name}.mp3'
 
-            # sftp_client.putfo(voice_file, remote_rvc_path)
+            sftp_client.putfo(voice_file, remote_rvc_path)
 
-            # # SFTP 세션 종료
-            # sftp_client.close()
+            # SFTP 세션 종료
+            sftp_client.close()
 
-            # commands = [
-            #     f'python3 preprocess.py {voice_name}\n',
-            #     f'python3 extract_features.py {voice_name}\n',
-            #     f'python3 train_index.py {voice_name}\n',
-            #     'pwd\n',
-            #     f'python3 train_model.py {voice_name}\n'
-            # ]
+            commands = [
+                f'python3 preprocess.py {voice_name}\n',
+                f'python3 extract_features.py {voice_name}\n',
+                f'python3 train_index.py {voice_name}\n',
+                'pwd\n',
+                f'python3 train_model.py {voice_name}\n'
+            ]
 
-            # for cmd in commands:
-            #     shell.send(cmd)
-            #     # 각 명령의 실행이 끝날 때까지 대기
-            #     output = receive_until_prompt(shell, prompt='$ ')
-            #     print('output:', output)  # 받은 출력을 표시
+            for cmd in commands:
+                shell.send(cmd)
+                # 각 명령의 실행이 끝날 때까지 대기
+                output = receive_until_prompt(shell, prompt='$ ')
+                print('output:', output)  # 받은 출력을 표시
 
-            # # 연결 종료
-            # client.close()
+            # 연결 종료
+            client.close()
 
             # 파일을 TemporaryFile 객체에 저장(image, rvc, sample)
             temp_voice = TemporaryFile.objects.create(
@@ -607,61 +607,61 @@ class voice_custom_complete(APIView):
 
         voice_creation_data = request.session.get('voice_creation')  # 세션 데이터
 
-        if action == 'play':
-            # 'Play'를 누르면 text랑 tone을 넘겨 받음
-            tts_text = data.get('tts_text', '')
-            tone = data.get('tone', 0)
-            print("TTS Text:", tts_text)
-            print("Tone:", tone)
-            text = data.get('tts_text', '').replace(' ', '')
-            voice_name = voice_creation_data.get('voice_name')
+        # if action == 'play':
+        #     # 'Play'를 누르면 text랑 tone을 넘겨 받음
+        #     tts_text = data.get('tts_text', '')
+        #     tone = data.get('tone', 0)
+        #     print("TTS Text:", tts_text)
+        #     print("Tone:", tone)
+        #     text = data.get('tts_text', '').replace(' ', '')
+        #     voice_name = voice_creation_data.get('voice_name')
 
-            # SSH 클라이언트 생성
-            client = paramiko.SSHClient()
-            # 호스트 키 자동으로 수락
-            client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            # SSH 연결 (키 기반 인증)
-            client.connect(hostname=hostname, username=username,
-                           key_filename=key_filename)
+        #     # SSH 클라이언트 생성
+        #     client = paramiko.SSHClient()
+        #     # 호스트 키 자동으로 수락
+        #     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        #     # SSH 연결 (키 기반 인증)
+        #     client.connect(hostname=hostname, username=username,
+        #                    key_filename=key_filename)
 
-            # 셸 세션 열기
-            shell = client.invoke_shell()
+        #     # 셸 세션 열기
+        #     shell = client.invoke_shell()
 
-            commands = [
-                f'python3 tts.py {text}\n',
-                'cd project-main\n',
-                f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
-                'rm -rf audios/tts.mp3\n',
-            ]
+        #     commands = [
+        #         f'python3 tts.py {text}\n',
+        #         'cd project-main\n',
+        #         f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
+        #         'rm -rf audios/tts.mp3\n',
+        #     ]
 
-            for cmd in commands:
-                shell.send(cmd)
-                # 각 명령의 실행이 끝날 때까지 기다립니다.
-                output = receive_until_prompt(shell, prompt='$ ')
-                print(output)  # 받은 출력을 표시합니다.
+        #     for cmd in commands:
+        #         shell.send(cmd)
+        #         # 각 명령의 실행이 끝날 때까지 기다립니다.
+        #         output = receive_until_prompt(shell, prompt='$ ')
+        #         print(output)  # 받은 출력을 표시합니다.
 
-            sftp_client = client.open_sftp()
+        #     sftp_client = client.open_sftp()
 
-            # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
-            remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
-            project_path = os.getcwd()
-            folder_path = os.path.join(project_path, 'static', 'tts')  # 경로 조합
-            if not os.path.exists(folder_path):
-                os.makedirs(folder_path)
-            sftp_client.get(remote_path, os.path.join(
-                project_path, f'static/tts/{voice_name}.mp3'))
-            # SFTP 세션 종료
-            sftp_client.close()
+        #     # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
+        #     remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
+        #     project_path = os.getcwd()
+        #     folder_path = os.path.join(project_path, 'static', 'tts')  # 경로 조합
+        #     if not os.path.exists(folder_path):
+        #         os.makedirs(folder_path)
+        #     sftp_client.get(remote_path, os.path.join(
+        #         project_path, f'static/tts/{voice_name}.mp3'))
+        #     # SFTP 세션 종료
+        #     sftp_client.close()
 
-            wav_file_path = os.path.join(
-                project_path, f'static/tts/{voice_name}.mp3')
-            play_wav(wav_file_path)
-            os.remove(os.path.join(project_path,
-                      f'static/tts/{voice_name}.mp3'))
+        #     wav_file_path = os.path.join(
+        #         project_path, f'static/tts/{voice_name}.mp3')
+        #     play_wav(wav_file_path)
+        #     os.remove(os.path.join(project_path,
+        #               f'static/tts/{voice_name}.mp3'))
 
-            return JsonResponse({'status': 'TTS processed'})
+        #     return JsonResponse({'status': 'TTS processed'})
 
-        elif action == 'save':
+        if action == 'save':
             voice_creation_data = request.session.get(
                 'voice_creation')  # 세션 데이터
 
@@ -675,61 +675,61 @@ class voice_custom_complete(APIView):
                 # TemporaryFile id 출력
                 print('temp_voice_id:', temp_voice_id)
 
-                # # param 조정된 rvc를 voice_path에 저장
-                # # SSH 클라이언트 생성
-                # client = paramiko.SSHClient()
-                # # 호스트 키 자동으로 수락
-                # client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                # # SSH 연결 (키 기반 인증)
-                # client.connect(hostname=hostname, username=username,
-                #                key_filename=key_filename)
+                # param 조정된 rvc를 voice_path에 저장
+                # SSH 클라이언트 생성
+                client = paramiko.SSHClient()
+                # 호스트 키 자동으로 수락
+                client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                # SSH 연결 (키 기반 인증)
+                client.connect(hostname=hostname, username=username,
+                               key_filename=key_filename)
 
-                # # 셸 세션 열기
-                # shell = client.invoke_shell()
+                # 셸 세션 열기
+                shell = client.invoke_shell()
 
-                # sample = "안녕하세요. 오디 많은 이용 부탁드려요."
-                # commands = [
-                #     f'python3 tts.py {sample}\n',
-                #     'cd project-main\n',
-                #     f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
-                #     'rm -rf audios/tts.mp3\n',
-                # ]
+                sample = "안녕하세요. 오디 많은 이용 부탁드려요."
+                commands = [
+                    f'python3 tts.py {sample}\n',
+                    'cd project-main\n',
+                    f'python3 inference.py {voice_name} {tone} audios/tts.mp3\n',
+                    'rm -rf audios/tts.mp3\n',
+                ]
 
-                # for cmd in commands:
-                #     shell.send(cmd)
-                #     # 각 명령의 실행이 끝날 때까지 기다립니다.
-                #     output = receive_until_prompt(shell, prompt='$ ')
-                #     print(output)  # 받은 출력을 표시합니다.
+                for cmd in commands:
+                    shell.send(cmd)
+                    # 각 명령의 실행이 끝날 때까지 기다립니다.
+                    output = receive_until_prompt(shell, prompt='$ ')
+                    print(output)  # 받은 출력을 표시합니다.
 
-                # sftp_client = client.open_sftp()
-                # # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
-                # remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
-                # project_path = os.getcwd()
-                # folder_path = os.path.join(
-                #     project_path, 'static', 'tts')  # 경로 조합
-                # if not os.path.exists(folder_path):
-                #     os.makedirs(folder_path)
-                #     print(f"폴더가 생성되었습니다: {folder_path}")
-                # else:
-                #     print(f"이미 해당 폴더가 존재합니다: {folder_path}")
+                sftp_client = client.open_sftp()
+                # 임시 저장한 로컬 파일을 원격 시스템으로 업로드
+                remote_path = f'/home/kimyea0454/project-main/audios/{voice_name}.mp3'
+                project_path = os.getcwd()
+                folder_path = os.path.join(
+                    project_path, 'static', 'tts')  # 경로 조합
+                if not os.path.exists(folder_path):
+                    os.makedirs(folder_path)
+                    print(f"폴더가 생성되었습니다: {folder_path}")
+                else:
+                    print(f"이미 해당 폴더가 존재합니다: {folder_path}")
 
-                # # 샘플 오디오 가져와서 static/tts에 저장
-                # sftp_client.get(remote_path, os.path.join(
-                #     project_path, f'static/tts/{voice_name}.mp3'))
+                # 샘플 오디오 가져와서 static/tts에 저장
+                sftp_client.get(remote_path, os.path.join(
+                    project_path, f'static/tts/{voice_name}.mp3'))
 
-                # # 모델 가져와서 static/tts에 저장
-                # remote_path = f'/home/kimyea0454/project-main/assets/weights/{voice_name}.pth'
-                # sftp_client.get(remote_path, os.path.join(
-                #     project_path, f'static/tts/{voice_name}.pth'))
+                # 모델 가져와서 static/tts에 저장
+                remote_path = f'/home/kimyea0454/project-main/assets/weights/{voice_name}.pth'
+                sftp_client.get(remote_path, os.path.join(
+                    project_path, f'static/tts/{voice_name}.pth'))
 
-                # # SFTP 세션 종료
-                # sftp_client.close()
+                # SFTP 세션 종료
+                sftp_client.close()
 
-                # project_path = os.getcwd()
-                # with open(os.path.join(project_path, f'static/tts/{voice_name}.mp3'), 'rb') as file:
-                #     voice_sample = ContentFile(file.read())
-                # with open(f'static/tts/{voice_name}.pth', 'rb') as file:
-                #     voice_model = ContentFile(file.read())
+                project_path = os.getcwd()
+                with open(os.path.join(project_path, f'static/tts/{voice_name}.mp3'), 'rb') as file:
+                    voice_sample = ContentFile(file.read())
+                with open(f'static/tts/{voice_name}.pth', 'rb') as file:
+                    voice_model = ContentFile(file.read())
 
                 # Voice 인스턴스 생성
                 print("voice 인스턴스 생성")
@@ -746,10 +746,10 @@ class voice_custom_complete(APIView):
                 serializer = VoiceSerializer(data=voice_data)
                 if serializer.is_valid():
                     voice_instance = serializer.save()
-                    # voice_instance.voice_sample_path.save(
-                    #     f"{voice_name}.mp3", voice_sample, save=False)
-                    # voice_instance.voice_path.save(
-                    #     f"{voice_name}.pth", voice_model, save=False)
+                    voice_instance.voice_sample_path.save(
+                        f"{voice_name}.mp3", voice_sample, save=False)
+                    voice_instance.voice_path.save(
+                        f"{voice_name}.pth", voice_model, save=False)
 
                     # temp_voice에서 정보를 가져와서 voice instance에 저장
                     self.save_file(voice_instance, voice_instance.voice_image_path,
@@ -769,28 +769,28 @@ class voice_custom_complete(APIView):
                         'errors': serializer.errors
                     }, status=501)
 
-                # # static/tts에 있는 파일 삭제
-                # os.remove(os.path.join(project_path,
-                #           f'static/tts/{voice_name}.mp3'))
-                # os.remove(os.path.join(project_path,
-                #           f'static/tts/{voice_name}.pth'))
+                # static/tts에 있는 파일 삭제
+                os.remove(os.path.join(project_path,
+                          f'static/tts/{voice_name}.mp3'))
+                os.remove(os.path.join(project_path,
+                          f'static/tts/{voice_name}.pth'))
 
-                # commands = [
-                #     f'rm -rf assets/weights/{voice_name}.pth\n',
-                #     f'rm -rf audios/{voice_name}.wav\n',
-                #     f'rm -rf logs/{voice_name}\n',
-                #     'rm -rf voices\n',
-                #     'mkdir voices\n',
-                # ]
+                commands = [
+                    f'rm -rf assets/weights/{voice_name}.pth\n',
+                    f'rm -rf audios/{voice_name}.wav\n',
+                    f'rm -rf logs/{voice_name}\n',
+                    'rm -rf voices\n',
+                    'mkdir voices\n',
+                ]
 
-                # for cmd in commands:
-                #     shell.send(cmd)
-                #     # 각 명령의 실행이 끝날 때까지 기다림
-                #     output = receive_until_prompt(shell, prompt='$ ')
-                #     print(output)
+                for cmd in commands:
+                    shell.send(cmd)
+                    # 각 명령의 실행이 끝날 때까지 기다림
+                    output = receive_until_prompt(shell, prompt='$ ')
+                    print(output)
 
-                # # 연결 종료
-                # client.close()
+                # 연결 종료
+                client.close()
 
                 # 세션 삭제
                 del request.session['voice_creation']
